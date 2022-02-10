@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div style="width:300px; margin-left:25px; float:left;" id="coordinateInput">
+
+	<!-- Position information start here -->		
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Analysis Results</h3>
+		</div>
+		<div class="panel-body">
+
+			<div class="table-responsive">
+
+				<table class="table table-striped">
+				  <thead>
+					<tr>
+					  <th colspan="2">Source Information</th>
+					</tr>
+				  </thead>
+				  <tbody>
+						<tr><td>Trigger ID: </td><td align="right" style="padding-right:18px">{{trigobj.trigid}}</td></tr>
+						<tr><td>Time: </td><td align="right" style="padding-right:18px">{{trigobj.trigger_time}}</td></tr>
+						<tr><td>Name: </td><td align="right" style="padding-right:18px">{% for name in trigobj.event_name %}
+							{{name}}
+							{% endfor %}</td></tr>
+						<tr><td>Position: </td><td align="right" style="padding-right:18px">{{trigobj.position}}</td></tr>
+						<tr><td>Error: </td><td align="right" style="padding-right:18px">{{trigobj.position_error}}</td></tr>
+					</tbody>
+				</table>  
+
+
+
+				<table class="table table-striped">
+				  <thead>
+					<tr>
+					  <th colspan="2">BAT Observability</th>
+						<tr><td>BAT Coverage: </td><td align="right" style="padding-right:18px"> {{trigobj.coverage_frac}}</td></tr>
+						<tr><td>Boresight RA/Dec: </td><td align="right" style="padding-right:18px"> {{realtimepoint.position}} </td></tr>		              
+						<tr><td>Boresight Roll: </td><td align="right" style="padding-right:18px"> {{realtimepoint.roll}} </td></tr>		              
+						<tr><td>Geocenter RA/Dec: </td><td align="right" style="padding-right:18px"> {{trigobj.earth_radec}} </td></tr>		              
+						<tr><td>Earth Radius: </td><td align="right" style="padding-right:18px"> </td></tr>
+					</tr>
+				  </thead>
+						 <tbody>		
+
+					</tbody>
+				</table>  
+
+
+				{% if trigobj.trigger_type =='GW' %}
+
+				<table class="table table-striped">
+				  <thead>
+					<tr>
+					  <th colspan="2">Observation Information</th>
+					</tr>
+				  </thead>
+						 <tbody>
+			
+						<tr><td>Source ID: </td><td id="event_id" align="right" style="padding-right:18px"></td></tr>
+						<tr><td>Skymap: </td><td id="skymap" align="right" style="padding-right:18px"></td></tr>
+						<tr><td>Detectors: </td><td id="trigger_detector" align="right" style="padding-right:18px"></td></tr>
+						<tr><td>Pipeline: </td><td id="trigger_pipeline" align="right" style="padding-right:18px"></td></tr>
+						<tr><td>Sky Area: </td><td id="area_90" align="right" style="padding-right:18px"></td></tr>		
+						<tr><td>Distance: </td><td id="trigger_distance" align="right" style="padding-right:18px"></td></tr>
+						<tr><td>Distance Std: </td><td id="trigger_distance_std" align="right" style="padding-right:18px"></td></tr>
+
+
+
+					</tbody>
+				</table>  
+				{% endif %}
+			
+			 </div>
+		</div>
+	</div>
+	<!-- Position information ends here -->		
+
+	<!-- Caveat statement start here -->	
+	<div>	
+		<center>
+			<div class="alert alert-info" role="alert">All analysis results presented here are preliminary unless otherwise stated.</div>
+		</center>
+	</div>
+	<!-- Caveat statement ends here -->	
+
+</div>
+
+<div id="content" style="padding-right:100px;">
+
+	<!-- localizaton panel start here -->	
+	<div id='localizations' style="width:1100px; margin-left: 340px;">
+		<div class="panel panel-default">
+		   <div class="panel-heading">
+			   <h3 class="panel-title">BAT Coverage & Localizations</h3>
+		   </div>
+			<div class="panel-body" style="height:650px">
+				<ul class="nav nav-tabs localization" style="height:42px">
+				 <li id="skymap" target="localization" class="navtab plots active"><a href="#" onclick="return false;">Gbuts</a></li>
+				 <!-- <li id="dol" target="localization" class="navtab plots"><a href="#" onclick="return false;">Dol</a></li> -->
+				 <li id="skymap_combined" target="localization" class="navtab plots"><a href="#" onclick="return false;">Combined</a></li>
+			   </ul>				     	
+			   <div class="plot">
+				   <img id="localization" class="img-responsive center-block" style="margin-top:25px;" src={{url}}/>
+			   </div>
+		   </div>	
+		 </div>
+   </div>
+   <!-- localizaton panel ends here -->
+
+	<!-- Event display panel start here -->	
+	<div id='eventDisplay' style="width:1100px; margin-left: 340px;">
+		 <div class="panel panel-default" style="height: 675px;">
+			<div class="panel-heading">
+				<h3 class="panel-title">Targeted Search Event Display</h3>
+			</div>
+			 <div class="panel-body">
+				 <ul class="nav nav-tabs event_display" style="height:42px">
+				  <li id="loglr" target="event_display" class="navtab plots active"><a href="#" onclick="return false;">Flattened</a></li>
+				  <li id="loglr_spec" target="event_display" class="navtab plots"><a href="#" onclick="return false;">Expanded</a></li>
+				</ul>
+				<div class="plot">
+					<img id="event_display" class="img-responsive center-block" height="400" style="margin: auto; margin-top:25px; display: none" src="#"/>
+				</div>
+			</div>	
+		  </div>
+	</div>
+	<!-- Event display panel ends here -->
+
+
+
+	<!-- GBM summed light curves panel start here -->	
+	<div id='summedLightCurves' style="width:1100px; margin-left: 340px;">
+		 <!-- <div class="panel panel-default" style="height: 700px"> -->
+		 <div id="parent_panel_summed" class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">BAT Full-Array Summed Light Curves</h3>
+			</div>
+			 <div class="panel-body" style="height: 670px !important;">
+				 <ul class="nav nav-tabs summed" style="height:42px">
+				  <li id="Summed_All_NaI_Chan1-6" target="summed" class="navtab plots active"><a href="#" onclick="return false;">All NaI Chan 1-6</a></li>
+				  <li id="Summed_Left_NaI_Chan3-4" target="summed" class="navtab plots"><a href="#" onclick="return false;">Left NaI Chan 3-4</a></li>
+				  <li id="Summed_Right_NaI_Chan3-4" target="summed" class="navtab plots"><a href="#" onclick="return false;">Right NaI Chan 3-4</a></li>
+				  <li id="Summed_All_BGO_Chan0-3" target="summed" class="navtab plots"><a href="#" onclick="return false;">All BGO Chan 0-3</a></li>
+				</ul>
+				<div class="plot">
+					<img id="summed" class="img-responsive center-block" height="400" style="margin: auto; margin-top:25px; display: none" src="#"/>
+				</div>
+			</div>	
+		  </div>
+	</div>
+	<!-- GBM Detector light curves panel ends here -->
+
+
+	<!-- Spacecraft position history panel start here -->	
+	<div id='positionPlot' style="width:1100px; margin-left: 340px;">
+		 <div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Spacecraft Position History</h3>
+			</div>
+			 <div class="panel-body" style="height:475px">
+				<div class="plot">
+					<img id="navigation_plot" class="img-responsive center-block" style="margin-top:25px; display: none" src="#"/>
+				</div>
+			</div>	
+		  </div>
+	</div>
+	<!-- Spacecraft position history panel ends here -->
+
+
+</div>
+<!-- Content ends here -->
+{% endblock %}}

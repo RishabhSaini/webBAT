@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<p>Real-time Pointing Info derived from GCN:</p><br>
+<blockquote>SWIFT_Actual_Pointing_Dir Notice contains the actual pointing direction of the s/c (bore-sight of the NFIs & BAT).
+    It is issued 20-40 seconds after Pre-planned/TOO slew has settled to less than 10arcmin.
+    Because ATs and TOOs interrupt the Pre-Planned Science Timeline (PPST), this "actual" pointing direction
+    notification is produced using the real-time telemtry stream from Swift.
+    Software within GCN monitors this 24/7 stream of telemetry from Swift (via TDRSS DAS)
+    looking for changes in the Ra,Dec,Roll values. Updates come down every 20 sec.
+    The code looks for changes that last longer than a single sample (both the beginning-of-slew change
+    and the end-of-slew change (ie the settling)). It is this constancy requirement that stretches
+    the distribution of the notice 20-40 sec. This also causes the short observations to be missed;
+    when Swift goes into a "tiling mode" TOO (exposures times in the 50-90 sec durations) they go unreported. 
+    https://gcn.gsfc.nasa.gov/swift.html</blockquote>
+
+<b>This information is used to provide a quick guess/estimate at the BAT coverage for targeted search events until the final attitude data becomes available.<br>
+It will not be accurate for triggers that occur while Swift is slewing (~18% of the time), or in other cases of realtime telem interruption.
+</b>
+<br> <br>
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>DateTime</th>
+      <th>RA Dec</th>
+      <th>Roll</th>
+    </tr>
+  </thead>
+  <tbody id="myTable">
+    {% for a in points %}
+      <tr>
+        <td>{{ a.timestamp }}</td>
+        <td>{{ a.position}}</td>
+        <td>{{ a.roll}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% endblock %}}

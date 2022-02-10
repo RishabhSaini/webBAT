@@ -1,0 +1,2 @@
+FLASK_APP=BATtargeted.py
+FLASK_ENV=development

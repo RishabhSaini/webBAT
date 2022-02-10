@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="padding-left:16px">
+    <h2>Submit Trigger</h2>
+    <form action="" method="post">
+      {{ form.hidden_tag() }}
+      <p>
+          {{ form.event_name.label}} {{ form.event_name }}
+      </p>
+      <p>
+        {{ form.trigger_instrument.label}} {{ form.trigger_instrument }}
+    </p>      
+    <p>
+        {{ form.trigger_type.label}} {{ form.trigger_type}}
+    </p>      
+    <p>
+        {{ form.trigtime.label}} {{ form.trigtime}} <b><i style="font-size: small;">YYYY-mm-ddTHH:MM:SS.ss e.g: 2001-01-01T12:30:15.50</i></b>
+    </p>      
+
+      <p>{{ form.submit() }}</p>
+      </form>
+    </div>
+
+{% endblock %}}

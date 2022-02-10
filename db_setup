@@ -1,0 +1,60 @@
+total pain to set up
+
+
+
+sudo -u aaron createdb bat-targeted-db
+psql -U aaron -d bat-targeted-db
+
+
+CREATE SCHEMA postgis;
+ALTER DATABASE "bat-targeted-db" SET search_path=public,postgis,contrib;
+CREATE EXTENSION postgis SCHEMA postgis;
+CREATE EXTENSION postgis_sfcgal SCHEMA postgis;
+CREATE EXTENSION pgrouting SCHEMA postgis;
+
+
+
+python3 manage.py db init
+python3 manage.py db migrate
+#go into the migrations/versions code and explicity import Geography objects
+python3 manage.py db upgrade
+
+
+
+
+
+
+##### on aws:https://stackoverflow.com/questions/46394880/aws-rds-postgresql-9-5-4-extension-postgis-tiger-geocoder-missing-soundex/52308287
+
+-- Postgis Installation
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- PostGIS AWS Configuration                                                                                                                  --
+-- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.html#Appendix.PostgreSQL.CommonDBATasks.PostGIS  --
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- On postgis schema
+SET SCHEMA '${POSTGIS_SCHEMA_NAME}';
+-- Step 2: Load the PostGIS Extensions
+create extension postgis;
+create extension fuzzystrmatch;
+-- FIX : To avoid "ERROR:  function soundex(character varying) does not exist", change schema and reconnect
+ALTER DATABASE ${DATABASE_NAME} SET search_path=${POSTGIS_SCHEMA_NAME};
+\connect ${DATABASE_NAME};
+-- End FIX
+create extension postgis_tiger_geocoder;
+create extension postgis_topology;
+-- Step 3: Transfer Ownership of the Extensions to the rds_superuser Role
+alter schema tiger owner to ${MASTER_USER};
+alter schema tiger_data owner to ${MASTER_USER};
+alter schema topology owner to ${MASTER_USER};
+-- Step 4: Transfer Ownership of the Objects to the rds_superuser Role
+CREATE FUNCTION exec(text) returns text language plpgsql volatile AS $f$ BEGIN EXECUTE $1; RETURN $1; END; $f$;
+SELECT exec('ALTER TABLE ' || quote_ident(s.nspname) || '.' || quote_ident(s.relname) || ' OWNER TO aaron;')
+  FROM (
+    SELECT nspname, relname
+    FROM pg_class c JOIN pg_namespace n ON (c.relnamespace = n.oid)
+    WHERE nspname in ('tiger','topology') AND
+    relkind IN ('r','S','v') ORDER BY relkind = 'S')
+s;
+
+-- Adding postgis to default schema
+ALTER DATABASE "bat-targeted-db" SET search_path=public,postgis,contrib;
