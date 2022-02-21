@@ -26,7 +26,8 @@ def index():
 @app.route('/trigger_report', methods=['POST', 'GET'])
 def trigger_report():
 	trigid = request.args.get('trigid')
-	#url = functions.return_image(BUCKET, f'{trigid}_skymap')
+	url = functions.return_image(BUCKET, f'EarthPlot.png')
+	print("Url is", url)
 	try:
 		#this is an incredibly shitty way to do this. fix later
 		trigres = db.session.query(trigger, func.ST_AsText(trigger.position).label('position')).filter_by(trigid=trigid).all()[0]
@@ -54,7 +55,7 @@ def trigger_report():
 			realtime_pointing.timestamp<trigobj.trigger_time
 		).order_by(realtime_pointing.timestamp.desc()).first()
 		#url = url return 
-	return render_template("trigger_report.html",trigobj = trigobj, realtimepoint=realtimepoint)
+	return render_template("trigger_report.html",trigobj = trigobj, realtimepoint=realtimepoint, url=url)
 
 
 @app.route('/realtime_point')

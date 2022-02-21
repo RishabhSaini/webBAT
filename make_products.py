@@ -29,19 +29,20 @@ BUCKET="bat-targeted"
 trigid = 1642548038
 trig_selected = trigger.query.filter_by(trigid = trigid).first()
 
-filenameipynb = f'./../toolsBat/{trigid}_skymap.ipynb'
-filename = f'../toolsBat/{trigid}_skymap.png'
+# filenameipynb = f'./../toolsBat/{trigid}_skymap.ipynb'
+# filename = f'./../toolsBat/{trigid}_skymap.png'
 
-notebook_filename = './../toolsBat/Triak.ipynb'
-with open(notebook_filename) as f:
-    nb = nbformat.read(f, as_version=4)
-ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
-ep.preprocess(nb, {'metadata': {'path': './../toolsBat/'}})
-with open(filenameipynb, 'w', encoding='utf-8') as f:
-    nbformat.write(nb, f)
+# notebook_filename = './../toolsBat/Triak.ipynb'
+# with open(notebook_filename) as f:
+#     nb = nbformat.read(f, as_version=4)
+# ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
+# ep.preprocess(nb, {'metadata': {'path': './../toolsBat/'}})
+# with open(filenameipynb, 'w', encoding='utf-8') as f:
+#     nbformat.write(nb, f)
 
 #export_images(filenameipynb, filename, "/images")
 
 earthPlot = SwiftEarthPlot(trig_selected.trigger_time, trig_selected.trigid)
 #skyMap = BAT_tools().justPlot(trig_selected.trigger_time, trig_selected.trigid)
-upload_file(filename, BUCKET)
+
+upload_file(earthPlot, BUCKET)
