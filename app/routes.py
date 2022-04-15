@@ -26,22 +26,13 @@ def index():
 @app.route('/trigger_report', methods=['POST', 'GET'])
 def trigger_report():
 	trigid = request.args.get('trigid')
-	url = functions.return_image(BUCKET, f'EarthPlot.png')
-	print("Url is", url)
+	url = functions.return_image(BUCKET, f"{trigid}_earthplot.png")
+	
 	try:
 		#this is an incredibly shitty way to do this. fix later
 		trigres = db.session.query(trigger, func.ST_AsText(trigger.position).label('position')).filter_by(trigid=trigid).all()[0]
 		trigobj = trigres[0]
 		trigobj.position = trigres[1]
-		#time_trig = trigobj.trigger_time
-		#print("Time is:",time_trig)
-
-		#
-		#Upload file return direct link. Same base but different name of file (based on trigid)
-		#Task go through the databse and produce images from trigids for which it doesnt already exist.
-		#Then create and upload on database. 
-		#Clicking th etirgger report should load the file from the database
-		#Function: 
 
 	except Exception as E:
 		print(E)

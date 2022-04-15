@@ -118,3 +118,11 @@ def upload_file(file_name, bucket):
     response = s3_client.upload_file(file_name, bucket, object_name)
 
     return response
+
+def delete_file(file_name, bucket):
+    """
+    Function to delete a file to an S3 bucket
+    """
+    s3 = boto3.client('s3')
+    s3.delete_object(Bucket=bucket, Key=file_name)
+    return 

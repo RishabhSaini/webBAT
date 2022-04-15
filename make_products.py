@@ -7,42 +7,31 @@ sys.path.insert(1, './../toolsBat')
 from plot_funcs import *
 from plotGBM import BAT_tools
 
-from imgExport import export_images
-
-import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
-
 BUCKET="bat-targeted"
 
-#time_trig = trigobj.trigger_time
-#p = BAT_tools() 
-#p.justPlot(time_trig)
+#Look through the AWS database, check if it doesnt have earthplots for all existing
+# trigger. If not existing make it and upload
 
-##Plotfuncs.py move to toolsBat : Done
-##Call to produce EarthMap (battools.py) and Skymap(plotgbm.py) from toolsBat
-##Upload to S3 buckets and file name standard trigid_(earthmap/skymap)
+files_in_bucket = []
+for file in list_files(BUCKET):
+    name = file['Key'] 
+    files_in_bucket.append(name)
 
-#Dont mix both 
+triggers =  trigger.query.filter().order_by(trigger.trigid.desc())
+print(f"Total: {len(triggers.all())} Added: {len(files_in_bucket)}")
 
+failed = []
+for a in triggers:
+    trigid = a.trigid
+    filename = f"{trigid}_earthplot.png"
+    if filename not in files_in_bucket:
+        try:
+            print("Trigid is: ", trigid)
+            trig_selected = trigger.query.filter_by(trigid = trigid).first()
+            earthPlot = SwiftEarthPlot(trig_selected.trigger_time, trig_selected.trigid, prompt=False)
+            upload_file(earthPlot, BUCKET)
+        except:
+            print("Failing now")
+            failed.append(filename)
 
-##for loop 
-trigid = 1642548038
-trig_selected = trigger.query.filter_by(trigid = trigid).first()
-
-# filenameipynb = f'./../toolsBat/{trigid}_skymap.ipynb'
-# filename = f'./../toolsBat/{trigid}_skymap.png'
-
-# notebook_filename = './../toolsBat/Triak.ipynb'
-# with open(notebook_filename) as f:
-#     nb = nbformat.read(f, as_version=4)
-# ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
-# ep.preprocess(nb, {'metadata': {'path': './../toolsBat/'}})
-# with open(filenameipynb, 'w', encoding='utf-8') as f:
-#     nbformat.write(nb, f)
-
-#export_images(filenameipynb, filename, "/images")
-
-earthPlot = SwiftEarthPlot(trig_selected.trigger_time, trig_selected.trigid)
-#skyMap = BAT_tools().justPlot(trig_selected.trigger_time, trig_selected.trigid)
-
-upload_file(earthPlot, BUCKET)
+print("failed: ", failed) 
